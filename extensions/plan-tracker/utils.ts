@@ -117,12 +117,12 @@ function normalizeStatus(status: unknown, completed?: boolean): TodoStatus {
 
 export function normalizeTodoItems(items: TodoItem[]): TodoItem[] {
 	return items
-		.map((item, index) => ({
-			step: index + 1,
+		.map((item) => ({
 			text: String(item.text ?? "").replace(/\s+/g, " ").trim(),
 			status: normalizeStatus(item.status, item.completed),
 		}))
-		.filter((item) => item.text.length > 0);
+		.filter((item) => item.text.length > 0)
+		.map((item, index) => ({ step: index + 1, text: item.text, status: item.status }));
 }
 
 export function isTodoCompleted(item: TodoItem): boolean {
@@ -155,13 +155,10 @@ export function extractTodoItems(message: string): TodoItem[] {
 	if (!headerMatch) return items;
 
 	const planSection = message.slice(message.indexOf(headerMatch[0]) + headerMatch[0].length);
-	const numberedPattern = /^\s*(\d+)[.)]\s+\*{0,2}([^*\n]+)/gm;
+	const numberedPattern = /^\s*(\d+)[.)]\s+(.+)$/gm;
 
 	for (const match of planSection.matchAll(numberedPattern)) {
-		const text = match[2]
-			.trim()
-			.replace(/\*{1,2}$/, "")
-			.trim();
+		const text = match[2].trim();
 		if (text.length > 5 && !text.startsWith("`") && !text.startsWith("/") && !text.startsWith("-")) {
 			const cleaned = cleanStepText(text);
 			if (cleaned.length > 3) {
