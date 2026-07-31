@@ -1,3 +1,15 @@
 node_modules/
 *.tgz
 .DS_Store
+
+# Local environment and registry credentials
+.env
+.env.*
+!.env.example
+.npmrc
+
+# Private keys and certificate bundles
+*.pem
+*.key
+*.p12
+*.pfx
